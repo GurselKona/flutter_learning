@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
+import 'userRecord.dart';
 
 class Insert extends StatefulWidget {
   const Insert({super.key});
@@ -20,8 +21,15 @@ class _InsertState extends State<Insert> {
 
   Future<void> addRecord() async {
     Database db = await openDatabase("db_AOF");
+
+    /* Add new record via standard JSON
     var user = {"FIRST_NAME": _firstName.text, "LAST_NAME": _lastName.text};
-    int userID = await db.insert("USERS", user);
+    int userID = await db.insert("USERS", user);*/
+
+    // Add new record via userRecord class
+    UserRecord user =
+        UserRecord(firstname: _firstName.text, lastname: _lastName.text);
+    int userID = await db.insert("USERS", user.toJson());
     print("Yeni kayıt eklendi: $userID");
     getAllRecords();
     db.close();
