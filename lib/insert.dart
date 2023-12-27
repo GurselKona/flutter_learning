@@ -14,6 +14,7 @@ class _InsertState extends State<Insert> {
   final _lastName = TextEditingController();
   final _userID = TextEditingController();
   List users = [];
+  List<UserRecord> userCls = [];
 
   void back() {
     Navigator.pop(context);
@@ -37,7 +38,15 @@ class _InsertState extends State<Insert> {
 
   Future<void> getAllRecords() async {
     Database db = await openDatabase("db_AOF");
-    users = await db.rawQuery("SELECT * FROM USERS");
+
+    /*//Get all record without using class.
+    users = await db.rawQuery("SELECT * FROM USERS");*/
+
+    //Get all records via UserRecord class.
+
+    userCls = List<UserRecord>.from((await db.rawQuery("SELECT * FROM USERS"))
+        .map((e) => UserRecord.fromJson(e)));
+
     db.close();
     setState(() {});
     print(users);
@@ -45,6 +54,7 @@ class _InsertState extends State<Insert> {
 
   Future<void> getOneRecord() async {
     Database db = await openDatabase("db_AOF");
+
     users = await db
         .rawQuery("SELECT * FROM USERS WHERE ID=?", [int.parse(_userID.text)]);
     _firstName.text = users.elementAt(0)["FIRST_NAME"].toString();
@@ -56,9 +66,21 @@ class _InsertState extends State<Insert> {
 
   void updateRecord() async {
     Database db = await openDatabase("db_AOF");
+
+    /*//Update without using class.
     int count = await db.rawUpdate(
         "UPDATE USERS SET FIRST_NAME = ?, LAST_NAME = ? WHERE ID = ?",
-        [_firstName.text, _lastName.text, _userID.text]);
+        [_firstName.text, _lastName.text, _userID.text]);*/
+
+    //Update using UserRecord class.
+
+    UserRecord user = UserRecord(
+        id: int.parse(_userID.text),
+        firstname: _firstName.text,
+        lastname: _lastName.text);
+    int count = await db.update("USERS", user.toJson(),
+        where: "ID=?", whereArgs: [int.parse(_userID.text)]);
+
     db.close();
     print("Güncellenen kayıt sayısı: $count");
     getAllRecords();
@@ -133,12 +155,15 @@ class _InsertState extends State<Insert> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: users.length,
+                itemCount: userCls.length,
                 itemBuilder: (context, index) {
                   return Row(children: [
-                    Text("${users.elementAt(index)["ID"]} "),
+                    Text("${userCls[index].id} "),
+                    Text("${userCls[index].firstname} "),
+                    Text("${userCls[index].lastname} "),
+                    /*Text("${users.elementAt(index)["ID"]} "),
                     Text("${users.elementAt(index)["FIRST_NAME"]} "),
-                    Text("${users.elementAt(index)["LAST_NAME"]} "),
+                    Text("${users.elementAt(index)["LAST_NAME"]} "),*/
                   ]);
                 },
               ),
