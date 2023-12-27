@@ -161,6 +161,9 @@ class _InsertState extends State<Insert> {
                     Text("${userCls[index].id} "),
                     Text("${userCls[index].firstname} "),
                     Text("${userCls[index].lastname} "),
+
+                    // The following code works for classless usage
+
                     /*Text("${users.elementAt(index)["ID"]} "),
                     Text("${users.elementAt(index)["FIRST_NAME"]} "),
                     Text("${users.elementAt(index)["LAST_NAME"]} "),*/
